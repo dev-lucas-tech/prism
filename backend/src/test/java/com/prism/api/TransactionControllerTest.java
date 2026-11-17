@@ -22,9 +22,8 @@ class TransactionControllerTest {
     void getTransactions_returnsDecomposedList() throws Exception {
         mvc.perform(get("/api/transactions"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].status").value("SETTLED"))
-                .andExpect(jsonPath("$[0].hiddenFxCost").exists())
-                .andExpect(jsonPath("$[0].effectiveMarkupBps").exists());
+                .andExpect(jsonPath("$[?(@.status=='SETTLED')].hiddenFxCost").isNotEmpty())
+                .andExpect(jsonPath("$[?(@.status=='SETTLED')].effectiveMarkupBps").isNotEmpty());
     }
 
     @Test

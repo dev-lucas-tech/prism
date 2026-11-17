@@ -45,7 +45,7 @@ public class SeedDataLoader implements ApplicationRunner {
         int seq = 0;
         for (Corridor corridor : Corridor.values()) {
             String[] merchants = merchantsFor(corridor);
-            String country = countryFor(corridor);
+            String country = corridor.country();
             for (int i = 0; i < PER_CORRIDOR; i++) {
                 String id = "seed-" + corridor + "-" + i;
                 Instant authorizedAt = BASE.minus(Duration.ofDays((seq % 28) + 1L))
@@ -77,16 +77,6 @@ public class SeedDataLoader implements ApplicationRunner {
             case COP -> new String[]{"Rappi CO", "Exito", "Avianca", "Claro Colombia"};
             case EUR -> new String[]{"Amazon EU", "SNCF", "Zalando", "Lufthansa"};
             case GBP -> new String[]{"Tesco", "British Airways", "Monzo Biz", "WeWork London"};
-        };
-    }
-
-    private static String countryFor(Corridor c) {
-        return switch (c) {
-            case MXN -> "Mexico";
-            case BRL -> "Brazil";
-            case COP -> "Colombia";
-            case EUR -> "Germany";
-            case GBP -> "United Kingdom";
         };
     }
 
