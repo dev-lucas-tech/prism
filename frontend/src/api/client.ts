@@ -27,6 +27,9 @@ export async function simulate(req: SimulateRequest): Promise<Transaction> {
 export type StreamHandler = (event: 'tx.created' | 'tx.updated', data: Transaction) => void
 
 export function openStream(onEvent: StreamHandler): () => void {
+  if (typeof EventSource === 'undefined') {
+    return () => {}
+  }
   const es = new EventSource('/api/stream')
   const listen = (name: 'tx.created' | 'tx.updated') =>
     es.addEventListener(name, (e: MessageEvent) => onEvent(name, JSON.parse(e.data) as Transaction))
