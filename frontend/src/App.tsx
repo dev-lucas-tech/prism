@@ -1,3 +1,5 @@
+import Dashboard from './pages/Dashboard'
+
 function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
@@ -9,7 +11,9 @@ function App() {
           </p>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6" />
+      <main className="mx-auto max-w-6xl px-4 py-6">
+        <Dashboard />
+      </main>
     </div>
   )
 }
