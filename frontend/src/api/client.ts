@@ -1,4 +1,4 @@
-import type { SimulateRequest, Summary, Transaction } from './types'
+import type { Corridor, Estimate, SimulateRequest, Summary, Transaction } from './types'
 
 async function asJson<T>(res: Response): Promise<T> {
   if (!res.ok) {
@@ -13,6 +13,10 @@ export async function getTransactions(): Promise<Transaction[]> {
 
 export async function getSummary(): Promise<Summary> {
   return asJson<Summary>(await fetch('/api/summary'))
+}
+
+export async function getEstimate(corridor: Corridor, amount: number): Promise<Estimate> {
+  return asJson<Estimate>(await fetch(`/api/estimate?corridor=${corridor}&amount=${amount}`))
 }
 
 export async function simulate(req: SimulateRequest): Promise<Transaction> {

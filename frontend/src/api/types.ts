@@ -46,3 +46,17 @@ export interface SimulateRequest {
   amount: number
   merchant: string
 }
+
+export interface Estimate {
+  corridor: Corridor
+  country: string
+  merchantAmount: number
+  midRate: number
+  midMarketCost: number
+  estimatedCost: number
+  estimatedHiddenFxCost: number
+  effectiveMarkupBps: number
+  stablecoinFeeBps: number
+  stablecoinCost: number
+  stablecoinSavings: number
+}
