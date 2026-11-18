@@ -14,3 +14,8 @@ export function pct(n: number | null | undefined): string {
   if (n === null || n === undefined) return DASH
   return `${(n * 100).toFixed(2)}%`
 }
+
+export function rate(n: number | null | undefined): string {
+  if (n === null || n === undefined || !Number.isFinite(n)) return DASH
+  return `$${n.toFixed(4)}`
+}
