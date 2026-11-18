@@ -31,4 +31,30 @@ describe('TransactionDrawer', () => {
     expect(screen.getByText('$54.27')).toBeInTheDocument()
     expect(screen.getByText('$1.08')).toBeInTheDocument()
   })
+
+  it('renders the two receipt sections with the hidden FX cost', () => {
+    render(<TransactionDrawer tx={settledTx} onClose={() => {}} />)
+    expect(screen.getByText(/what you see/i)).toBeInTheDocument()
+    expect(screen.getByText(/what prism adds/i)).toBeInTheDocument()
+    expect(screen.getByText(/hidden fx cost/i)).toBeInTheDocument()
+    expect(screen.getAllByText('$1.35').length).toBeGreaterThan(0)
+  })
+
+  it('renders dashes, not NaN, for a not-yet-settled transaction', () => {
+    const pending: Transaction = {
+      ...settledTx,
+      status: 'AUTHORIZED',
+      settledAt: null,
+      midSettleRate: null,
+      settledCost: null,
+      midMarketCost: null,
+      hiddenFxCost: null,
+      effectiveMarkupBps: null,
+      stablecoinCost: null,
+      stablecoinSavings: null,
+      surpriseVsEstimate: null,
+    }
+    render(<TransactionDrawer tx={pending} onClose={() => {}} />)
+    expect(screen.queryByText(/NaN/)).not.toBeInTheDocument()
+  })
 })

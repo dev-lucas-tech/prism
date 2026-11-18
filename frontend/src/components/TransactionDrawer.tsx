@@ -1,5 +1,5 @@
 import type { Transaction } from '../api/types'
-import { bps, money } from '../lib/format'
+import { bps, money, rate } from '../lib/format'
 
 interface Props {
   tx: Transaction
@@ -18,6 +18,9 @@ function Row({ label, value, accent }: { label: string; value: string; accent?: 
 }
 
 export default function TransactionDrawer({ tx, onClose }: Props) {
+  const amountCharged = tx.settledCost ?? tx.estimatedCost
+  const conversionRate = tx.purchaseAmount ? amountCharged / tx.purchaseAmount : null
+
   return (
     <div className="fixed inset-0 z-20 flex justify-end">
       <div className="absolute inset-0 bg-slate-900/30" onClick={onClose} aria-hidden="true" />
@@ -39,13 +42,24 @@ export default function TransactionDrawer({ tx, onClose }: Props) {
         </div>
 
         <div className="mt-4 rounded-lg border border-slate-200 p-4">
-          <div className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">FX decomposition</div>
-          <Row label="Purchase amount" value={`${tx.purchaseAmount.toLocaleString()} ${tx.corridor}`} />
-          <Row label="Estimated at swipe (mid)" value={money(tx.estimatedCost)} />
-          <Row label="Mid-market at settlement" value={money(tx.midMarketCost)} />
-          <Row label="Settled cost (charged)" value={money(tx.settledCost)} />
-          <Row label="Effective markup" value={bps(tx.effectiveMarkupBps)} />
+          <div className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">
+            What you see in Jeeves today
+          </div>
+          <Row label="Status" value={tx.status} />
+          <Row label="Merchant charge" value={`${tx.purchaseAmount.toLocaleString()} ${tx.corridor}`} />
+          <Row label="Amount charged" value={money(amountCharged)} />
+          <Row label="Conversion rate" value={`${rate(conversionRate)} / ${tx.corridor}`} />
+          <Row label="Card" value={`•••• 1234 · ${tx.employee}`} />
+        </div>
+
+        <div className="mt-4 rounded-lg border border-indigo-200 bg-indigo-50 p-4">
+          <div className="mb-1 text-xs font-medium uppercase tracking-wide text-indigo-700">
+            What Prism adds
+          </div>
+          <Row label="Mid-market reference" value={money(tx.midMarketCost)} />
           <Row label="Hidden FX cost" value={money(tx.hiddenFxCost)} accent />
+          <Row label="Effective markup" value={bps(tx.effectiveMarkupBps)} />
+          <Row label="Estimated at swipe (mid)" value={money(tx.estimatedCost)} />
           <Row label="Surprise vs. estimate" value={money(tx.surpriseVsEstimate)} accent />
         </div>
 
@@ -60,6 +74,9 @@ export default function TransactionDrawer({ tx, onClose }: Props) {
         <div className="mt-4 space-y-1 text-xs text-slate-500">
           <div>Authorized: {new Date(tx.authorizedAt).toLocaleString()}</div>
           <div>Settled: {tx.settledAt ? new Date(tx.settledAt).toLocaleString() : 'pending'}</div>
+          <div className="pt-1 text-slate-400">
+            True FX cost is set at settlement (T+1–T+3); the estimate at swipe can differ.
+          </div>
         </div>
       </aside>
     </div>
