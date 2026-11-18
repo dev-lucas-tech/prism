@@ -1,7 +1,7 @@
 package com.prism.analyst.adapter.tools;
 
-import com.prism.analyst.domain.AgentTool;
 import com.prism.analyst.domain.AnalystReport;
+import com.prism.analyst.domain.FindingsSubmission;
 import com.prism.analyst.domain.ReportParseException;
 import com.prism.transaction.TransactionService;
 import tools.jackson.databind.JsonNode;
@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubmitFindingsTool implements AgentTool {
+public class SubmitFindingsTool implements FindingsSubmission {
 
     private final TransactionService transactions;
     private final ObjectMapper mapper;
