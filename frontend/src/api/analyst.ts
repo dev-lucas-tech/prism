@@ -1,7 +1,7 @@
 export interface Finding {
   title: string
   severity: string
-  dollarsAtStake: string
+  dollarsAtStake: string | number
   corridor: string
   evidenceTxIds: string[]
   recommendation: string
@@ -9,8 +9,18 @@ export interface Finding {
 
 export interface AnalystReport {
   headline: string
-  totalAddressable: string
+  totalAddressable: string | number
   findings: Finding[]
+}
+
+export async function getAnalystStatus(): Promise<{ configured: boolean }> {
+  try {
+    const res = await fetch('/api/analyst/status')
+    if (!res.ok) return { configured: true }
+    return (await res.json()) as { configured: boolean }
+  } catch {
+    return { configured: true }
+  }
 }
 
 export type TraceEntry =

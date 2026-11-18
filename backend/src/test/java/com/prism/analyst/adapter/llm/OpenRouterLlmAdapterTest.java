@@ -19,6 +19,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.hamcrest.Matchers.containsString;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -97,6 +99,20 @@ class OpenRouterLlmAdapterTest {
         AiUnavailableException ex = assertThrows(AiUnavailableException.class,
                 () -> new OpenRouterLlmAdapter(builder, props("sk-test"), mapper).complete(req()));
         assertTrue(ex.getMessage().toLowerCase().contains("credit"));
+    }
+
+    @Test
+    void assistantMessageWithoutContentOrToolCallsGetsEmptyContent() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(requestTo(BASE + "/chat/completions"))
+                .andExpect(content().string(containsString("\"content\":\"\"")))
+                .andRespond(withSuccess(CONTENT_JSON, MediaType.APPLICATION_JSON));
+
+        ChatRequest request = new ChatRequest(
+                List.of(ChatMessage.user("hi"), ChatMessage.assistant(null, List.of())), List.of());
+        new OpenRouterLlmAdapter(builder, props("sk-test"), mapper).complete(request);
+        server.verify();
     }
 
     @Test

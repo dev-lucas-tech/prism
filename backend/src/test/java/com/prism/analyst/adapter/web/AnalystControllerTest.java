@@ -1,5 +1,6 @@
 package com.prism.analyst.adapter.web;
 
+import com.prism.analyst.config.AnalystProperties;
 import com.prism.analyst.domain.AgentEvent;
 import com.prism.analyst.domain.AgentTraceSink;
 import com.prism.analyst.domain.AiNotConfiguredException;
@@ -23,6 +24,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,9 +33,16 @@ class AnalystControllerTest {
     private final ObjectMapper mapper = JsonMapper.builder().build();
     private final FxAnalystAgent agent = mock(FxAnalystAgent.class);
     private final Executor inlineExecutor = Runnable::run;
+    private final AnalystProperties props = configuredProps();
     private final MockMvc mvc = MockMvcBuilders
-            .standaloneSetup(new AnalystController(agent, inlineExecutor, mapper))
+            .standaloneSetup(new AnalystController(agent, inlineExecutor, mapper, props))
             .build();
+
+    private AnalystProperties configuredProps() {
+        AnalystProperties p = new AnalystProperties();
+        p.setApiKey("sk-test");
+        return p;
+    }
 
     private AnalystReport sampleReport() {
         return new AnalystReport("You lost $42", new BigDecimal("42.00"),
@@ -57,6 +66,13 @@ class AnalystControllerTest {
 
         assertTrue(body.contains("final"), () -> "no final event in: " + body);
         assertTrue(body.contains("You lost $42"), () -> "no headline in: " + body);
+    }
+
+    @Test
+    void statusReportsConfiguredWhenKeyPresent() throws Exception {
+        mvc.perform(get("/api/analyst/status"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.configured").value(true));
     }
 
     @Test

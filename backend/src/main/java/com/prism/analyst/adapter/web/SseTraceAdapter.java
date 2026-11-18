@@ -41,7 +41,7 @@ public class SseTraceAdapter implements AgentTraceSink {
                 case AgentEvent.Error e ->
                         send("error", mapper.createObjectNode().put("message", e.message()));
             }
-        } catch (IOException ex) {
+        } catch (IOException | IllegalStateException ex) {
             emitter.completeWithError(ex);
         }
     }

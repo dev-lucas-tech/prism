@@ -99,6 +99,9 @@ public class OpenRouterLlmAdapter implements LlmClient {
                     fn.put("arguments", tc.arguments() == null ? "{}" : mapper.writeValueAsString(tc.arguments()));
                 }
             }
+            if (!msg.has("content") && !msg.has("tool_calls")) {
+                msg.put("content", "");
+            }
         }
 
         if (request.tools() != null && !request.tools().isEmpty()) {

@@ -2,11 +2,19 @@ import { render, screen } from '@testing-library/react'
 import type { AnalystState } from '../hooks/useAnalyst'
 import AnalystPanel from './AnalystPanel'
 
-const h = vi.hoisted(() => ({ state: null as AnalystState | null }))
+const h = vi.hoisted(() => ({ state: null as AnalystState | null, configured: true }))
 
 vi.mock('../hooks/useAnalyst', () => ({
   useAnalyst: () => h.state,
 }))
+
+vi.mock('../api/analyst', () => ({
+  getAnalystStatus: () => Promise.resolve({ configured: h.configured }),
+}))
+
+beforeEach(() => {
+  h.configured = true
+})
 
 function baseState(overrides: Partial<AnalystState>): AnalystState {
   return {
@@ -48,6 +56,40 @@ describe('AnalystPanel', () => {
     expect(screen.getByText('BRL markup')).toBeInTheDocument()
     expect(screen.getByText('$24.00')).toBeInTheDocument()
     expect(screen.getByText('t1')).toBeInTheDocument()
+  })
+
+  it('formats a numeric dollarsAtStake (as the backend serializes BigDecimal)', () => {
+    h.state = baseState({
+      status: 'done',
+      report: {
+        headline: 'h',
+        totalAddressable: 42,
+        findings: [
+          {
+            title: 'MXN markup',
+            severity: 'medium',
+            dollarsAtStake: 24,
+            corridor: 'MXN',
+            evidenceTxIds: [],
+            recommendation: 'pay local',
+          },
+        ],
+      },
+    })
+
+    render(<AnalystPanel />)
+
+    expect(screen.getByText('$24.00')).toBeInTheDocument()
+  })
+
+  it('disables the button and hints when the analyst is not configured', async () => {
+    h.state = baseState({ status: 'idle' })
+    h.configured = false
+
+    render(<AnalystPanel />)
+
+    expect(await screen.findByText(/OPENROUTER_API_KEY/)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /analyze recent activity/i })).toBeDisabled()
   })
 
   it('shows a friendly error state', () => {

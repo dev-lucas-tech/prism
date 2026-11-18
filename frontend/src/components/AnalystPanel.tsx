@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAnalyst } from '../hooks/useAnalyst'
-import type { Finding, TraceEntry } from '../api/analyst'
+import { getAnalystStatus, type Finding, type TraceEntry } from '../api/analyst'
 import { money } from '../lib/format'
 
 const SEVERITY_CLASS: Record<string, string> = {
@@ -51,7 +51,14 @@ function FindingCard({ finding }: { finding: Finding }) {
 export default function AnalystPanel() {
   const { status, trace, report, error, run } = useAnalyst()
   const [question, setQuestion] = useState('')
+  const [configured, setConfigured] = useState(true)
   const busy = status === 'running'
+
+  useEffect(() => {
+    getAnalystStatus()
+      .then((s) => setConfigured(s.configured))
+      .catch(() => {})
+  }, [])
 
   return (
     <section className="rounded-xl border border-indigo-200 bg-white p-4">
@@ -72,12 +79,18 @@ export default function AnalystPanel() {
         />
         <button
           onClick={() => run(question || undefined)}
-          disabled={busy}
+          disabled={busy || !configured}
           className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
         >
           {busy ? 'Analyzing…' : 'Analyze recent activity'}
         </button>
       </div>
+
+      {!configured && (
+        <p className="mb-2 text-xs text-slate-500">
+          Set <code>OPENROUTER_API_KEY</code> in the backend environment to enable the analyst.
+        </p>
+      )}
 
       {error && (
         <p role="alert" className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700">

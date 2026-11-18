@@ -1,5 +1,6 @@
 package com.prism.analyst.adapter.web;
 
+import com.prism.analyst.config.AnalystProperties;
 import com.prism.analyst.domain.AgentEvent;
 import com.prism.analyst.domain.AiNotConfiguredException;
 import com.prism.analyst.domain.AiUnavailableException;
@@ -23,11 +24,22 @@ public class AnalystController {
     private final FxAnalystAgent agent;
     private final Executor executor;
     private final ObjectMapper mapper;
+    private final AnalystProperties properties;
 
-    public AnalystController(FxAnalystAgent agent, @Qualifier("analystExecutor") Executor executor, ObjectMapper mapper) {
+    public AnalystController(FxAnalystAgent agent, @Qualifier("analystExecutor") Executor executor,
+                             ObjectMapper mapper, AnalystProperties properties) {
         this.agent = agent;
         this.executor = executor;
         this.mapper = mapper;
+        this.properties = properties;
+    }
+
+    public record AnalystStatus(boolean configured) {
+    }
+
+    @GetMapping("/status")
+    public AnalystStatus status() {
+        return new AnalystStatus(properties.isConfigured());
     }
 
     @GetMapping("/stream")
