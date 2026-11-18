@@ -8,6 +8,7 @@ import TransactionTable from '../components/TransactionTable'
 import TransactionDrawer from '../components/TransactionDrawer'
 import LiveFeed from '../components/LiveFeed'
 import SimulateButton from '../components/SimulateButton'
+import AnalystPanel from '../components/AnalystPanel'
 
 export default function Dashboard() {
   const [summary, setSummary] = useState<Summary | null>(null)
@@ -47,6 +48,7 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <KpiTiles summary={summary} />
+      <AnalystPanel />
       <div className="grid gap-6 lg:grid-cols-2">
         <CorridorChart breakdown={summary.corridorBreakdown} />
         <div className="rounded-xl border border-slate-200 bg-white p-4">
