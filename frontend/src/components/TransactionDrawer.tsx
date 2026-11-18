@@ -43,7 +43,7 @@ export default function TransactionDrawer({ tx, onClose }: Props) {
 
         <div className="mt-4 rounded-lg border border-slate-200 p-4">
           <div className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">
-            What you see in Jeeves today
+            Default View
           </div>
           <Row label="Status" value={tx.status} />
           <Row label="Merchant charge" value={`${tx.purchaseAmount.toLocaleString()} ${tx.corridor}`} />
@@ -54,7 +54,7 @@ export default function TransactionDrawer({ tx, onClose }: Props) {
 
         <div className="mt-4 rounded-lg border border-indigo-200 bg-indigo-50 p-4">
           <div className="mb-1 text-xs font-medium uppercase tracking-wide text-indigo-700">
-            What Prism adds
+            Showing Hidden Fees
           </div>
           <Row label="Mid-market reference" value={money(tx.midMarketCost)} />
           <Row label="Hidden FX cost" value={money(tx.hiddenFxCost)} accent />

@@ -34,8 +34,8 @@ describe('TransactionDrawer', () => {
 
   it('renders the two receipt sections with the hidden FX cost', () => {
     render(<TransactionDrawer tx={settledTx} onClose={() => {}} />)
-    expect(screen.getByText(/what you see/i)).toBeInTheDocument()
-    expect(screen.getByText(/what prism adds/i)).toBeInTheDocument()
+    expect(screen.getByText(/default view/i)).toBeInTheDocument()
+    expect(screen.getByText(/showing hidden fees/i)).toBeInTheDocument()
     expect(screen.getByText(/hidden fx cost/i)).toBeInTheDocument()
     expect(screen.getAllByText('$1.35').length).toBeGreaterThan(0)
   })

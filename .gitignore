@@ -1,6 +1,8 @@
 .superpowers/
+docs/superpowers/
 backend/build/
 backend/.gradle/
+backend/HELP.md
 frontend/node_modules/
 frontend/dist/
 *.log

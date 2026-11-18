@@ -68,14 +68,15 @@ and the tool→`TransactionService` bridges are adapters. The API key is read fr
 logged; tool args are validated/clamped; the loop is capped (6 rounds) with timeouts; and every cited
 transaction id is verified to exist before it reaches the UI.
 
-**Enable it** — set your OpenRouter key and (optionally) a model, then run normally:
+**Enable it** — set your OpenRouter key (and optionally a model), then run normally:
 ```sh
 export OPENROUTER_API_KEY=sk-or-...        # required; without it the analyst returns a clear "not configured" state
-export PRISM_AI_MODEL=anthropic/claude-sonnet-4.5   # optional; use a cheaper slug (e.g. openai/gpt-4o-mini) for dev/test
+export PRISM_AI_MODEL=openai/gpt-4o-mini   # optional; this is the default — swap for a stronger slug like anthropic/claude-sonnet-4.5
 ```
-Config lives under `prism.ai.*` in `backend/src/main/resources/application.yaml` (model, base-url,
-max-rounds, max-tokens, timeouts). The stream endpoint is `GET /api/analyst/stream?q=<optional question>`.
-The rest of Prism runs fine without a key — only the analyst panel is gated.
+Config lives under `prism.ai.*` in `backend/src/main/resources/application.properties` (model, base-url,
+max-rounds, max-tokens, timeouts). The default model is `openai/gpt-4o-mini` (cheap, reliable tool-calling).
+The stream endpoint is `GET /api/analyst/stream?q=<optional question>`, and `GET /api/analyst/status`
+reports whether a key is configured. The rest of Prism runs fine without a key — only the analyst panel is gated.
 
 ## Prerequisites
 
@@ -123,10 +124,17 @@ cd backend && ./gradlew test
 cd frontend && npm test
 ```
 
+## Demo walkthrough — AI FX Analyst
+
+5. In the **AI FX Analyst** panel, click **Analyze recent activity** (needs `OPENROUTER_API_KEY`).
+   Watch the **live tool-trace** as the agent calls `get_spend_summary` → `list_recent_transactions`
+   → `get_transaction_breakdown`, then renders ranked, evidence-cited savings findings.
+
 ## Project layout
 
 ```
-backend/   Spring Boot service (FX model, API, SSE, simulator, seed)
-frontend/  React dashboard (KPIs, chart, table, drawer, live feed)
-docs/      DESIGN.md (approved design) and the implementation plan
+backend/   Spring Boot service (FX model, REST + SSE, settlement simulator, seed,
+           and the agentic FX analyst: domain core + ports + OpenRouter/tools/web adapters)
+frontend/  React dashboard (KPIs, chart, table, decomposition drawer, live feed, AI analyst panel)
+docs/      DESIGN.md — the design and key decisions/trade-offs
 ```

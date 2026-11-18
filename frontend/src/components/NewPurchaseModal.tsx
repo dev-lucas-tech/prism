@@ -114,7 +114,7 @@ export default function NewPurchaseModal({ onClose }: { onClose: () => void }) {
           <div className="mt-4 space-y-3">
             <section className="rounded-lg border border-slate-200 p-4">
               <div className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-500">
-                What you see in Jeeves today
+                Default View
               </div>
               <Row
                 label="Merchant charge"
@@ -128,7 +128,7 @@ export default function NewPurchaseModal({ onClose }: { onClose: () => void }) {
             </section>
             <section className="rounded-lg border border-indigo-200 bg-indigo-50 p-4">
               <div className="mb-1 text-xs font-medium uppercase tracking-wide text-indigo-700">
-                What Prism adds
+                Showing Hidden Fees
               </div>
               <Row label="Mid-market reference" value={money(estimate.midMarketCost)} />
               <Row label="Est. hidden FX cost" value={money(estimate.estimatedHiddenFxCost)} accent />
@@ -136,7 +136,7 @@ export default function NewPurchaseModal({ onClose }: { onClose: () => void }) {
               <Row label="Via stablecoin corridor" value={money(estimate.stablecoinCost)} />
               <Row label="You'd save" value={money(estimate.stablecoinSavings)} />
               <p className="mt-2 text-xs text-slate-500">
-                The markup is known now — it's Jeeves's own rate. Only the final mid-market rate settles over T+1–T+3, so the exact total can move slightly. Neither is shown on your card today.
+                The markup is set at swipe; only the mid-market rate settles over T+1–T+3, so just the exact total moves slightly. A single blended rate hides both — itemizing them is a disclosure choice, not a technical limit.
               </p>
             </section>
           </div>

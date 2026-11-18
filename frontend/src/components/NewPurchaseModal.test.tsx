@@ -30,8 +30,8 @@ describe('NewPurchaseModal', () => {
 
     fireEvent.change(screen.getByLabelText(/merchant amount/i), { target: { value: '1800' } })
 
-    expect(await screen.findByText(/what you see/i)).toBeInTheDocument()
-    expect(screen.getByText(/what prism adds/i)).toBeInTheDocument()
+    expect(await screen.findByText(/default view/i)).toBeInTheDocument()
+    expect(screen.getByText(/showing hidden fees/i)).toBeInTheDocument()
     expect(await screen.findByText(/9\.99/)).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /authorize/i }))
