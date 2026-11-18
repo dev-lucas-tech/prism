@@ -40,6 +40,10 @@ public class TransactionService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "transaction not found: " + id));
     }
 
+    public boolean exists(String id) {
+        return id != null && repository.existsById(id);
+    }
+
     public TransactionDto toDto(Transaction t) {
         BigDecimal estimatedCost = t.getPurchaseAmount().multiply(t.getMidAuthRate()).setScale(MONEY_SCALE, RM);
         if (t.getMidSettleRate() == null) {

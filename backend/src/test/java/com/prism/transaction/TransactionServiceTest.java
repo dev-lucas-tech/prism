@@ -9,9 +9,12 @@ import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class TransactionServiceTest {
@@ -57,6 +60,18 @@ class TransactionServiceTest {
         assertEquals(0, s.totalSpend().compareTo(new BigDecimal("55.35")));
         assertEquals(1, s.corridorBreakdown().size());
         assertEquals(Corridor.MXN, s.corridorBreakdown().get(0).corridor());
+    }
+
+    @Test
+    void exists_delegatesToRepositoryAndGuardsNull() {
+        TransactionRepository repo = mock(TransactionRepository.class);
+        when(repo.existsById("x")).thenReturn(true);
+        TransactionService svc = new TransactionService(repo, markup);
+
+        assertTrue(svc.exists("x"));
+        assertFalse(svc.exists("y"));
+        assertFalse(svc.exists(null));
+        verify(repo, never()).existsById(null);
     }
 
     @Test
