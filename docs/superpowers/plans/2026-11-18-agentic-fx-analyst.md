@@ -258,14 +258,20 @@
 ### Task 7: Frontend — FX Analyst panel (live trace + findings)
 
 **Files:**
-- Create: `frontend/src/api/analyst.ts` (open the SSE stream; typed events)
-- Create: `frontend/src/components/AnalystPanel.tsx`
+- Create: `frontend/src/api/analyst.ts` (adapter: open the SSE stream; parse to typed events)
+- Create: `frontend/src/hooks/useAnalyst.ts` (orchestration: run state from the adapter)
+- Create: `frontend/src/components/AnalystPanel.tsx` (presentation)
 - Modify: `frontend/src/App.tsx` (mount the panel)
-- Test: `frontend/src/components/AnalystPanel.test.tsx`
+- Test: `frontend/src/hooks/useAnalyst.test.ts`, `frontend/src/components/AnalystPanel.test.tsx`
+
+**Architecture:** layered adapter → hook → presentation (client mirror of ports & adapters).
 
 **Interfaces:**
 - Consumes: `GET /api/analyst/stream?q=` SSE events (`round_start|tool_call|tool_result|final|error`).
-- Produces: `AnalystPanel` React component; `openAnalystStream(question?, handlers)` returning a close fn.
+- Produces:
+  - adapter `openAnalystStream(question: string | undefined, handlers: {onTrace,onFinal,onError}) => () => void` (returns close fn);
+  - hook `useAnalyst()` → `{ status, trace, report, error, run(question?), reset() }`;
+  - `AnalystPanel` React component (renders hook state only).
 
 - [ ] **Step 1: Write the failing test** (mock `EventSource`)
 

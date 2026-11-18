@@ -184,6 +184,15 @@ This keeps the orchestration logic pure and testable with fakes, and makes the L
   fence-stripped JSON parse fallback.
 
 ### Frontend
+- **Frontend architecture — layered (adapter → hook → presentation)**, the client-side mirror of the
+  backend's ports & adapters, and consistent with Prism's existing `api/ hooks/ components/ lib/` layout:
+  - **Adapter** (`api/analyst.ts`): transport only — opens the `EventSource`, parses raw SSE frames into
+    typed domain events; no React.
+  - **Orchestration** (`useAnalyst()` hook): owns run state (status, accumulating trace, final report,
+    error), calls the adapter, exposes a clean state object — the client's "use-case" seam.
+  - **Presentation** (`AnalystPanel.tsx` + small pure subcomponents): render hook state only; no transport.
+  - Considered and rejected: Feature-Sliced Design (overkill for one feature); plain
+    container/presentational (fine, but the hook seam tests better and matches the repo's `hooks/`).
 - New **"FX Analyst"** panel/button on the dashboard: *"Analyze recent activity."* On click it opens the
   SSE stream, renders the **live tool-trace** (a compact timeline), then the **final findings cards**
   (severity, $ at stake, evidence-tx chips, recommendation). Optional text input for a custom question.
