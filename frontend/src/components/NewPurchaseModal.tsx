@@ -136,7 +136,7 @@ export default function NewPurchaseModal({ onClose }: { onClose: () => void }) {
               <Row label="Via stablecoin corridor" value={money(estimate.stablecoinCost)} />
               <Row label="You'd save" value={money(estimate.stablecoinSavings)} />
               <p className="mt-2 text-xs text-slate-500">
-                This is an estimate. The true FX cost is set at settlement (T+1–T+3) and can differ.
+                The markup is known now — it's Jeeves's own rate. Only the final mid-market rate settles over T+1–T+3, so the exact total can move slightly. Neither is shown on your card today.
               </p>
             </section>
           </div>
