@@ -31,6 +31,7 @@ corridor**, where the markup collapses to a small corridor fee.
 - **FX leakage dashboard** — total hidden cost, effective markup, and stablecoin savings, with a by-corridor breakdown.
 - **Live settlement feed** — simulate a purchase and watch it flip from *"Pending — estimated"* to *"Settled — true cost + hidden markup"* in real time over Server-Sent Events.
 - **Detail drawer** — the full FX breakdown and the stablecoin-corridor alternative for any transaction.
+- **AI FX Analyst (agentic)** — a bounded tool-calling loop where an LLM investigates recent spend over read-only tools and streams a live tool-trace plus ranked, evidence-cited savings findings. See below.
 
 ## Architecture
 
@@ -51,6 +52,30 @@ frontend (React + TS + Vite + Tailwind)        backend (Java 21 + Spring Boot)
 
 **Tech:** Java 21, Spring Boot 4 (web, data-jpa, validation), H2, Gradle, JUnit 5 + MockMvc ·
 React 19, TypeScript, Vite, Tailwind v4, Recharts, Vitest + Testing Library.
+
+## AI FX Analyst (agentic)
+
+A backend **tool-calling agent** turns Prism's data into advice. Given a question (or the default
+"where am I losing the most to FX?"), a strong LLM runs a bounded loop over three **read-only** tools —
+`get_spend_summary` → `list_recent_transactions` → `get_transaction_breakdown` — then calls a terminal
+`submit_findings` tool whose schema *is* the final report. The loop's tool-trace streams live to the UI
+over SSE, and every dollar figure comes from Prism's deterministic `FxCalculator` (the model orchestrates
+and narrates; it never invents numbers).
+
+**Design notes (hexagonal / security):** the domain core (`FxAnalystAgent` + the `LlmClient`,
+`AgentTool`, `AgentTraceSink`, `FindingsSubmission` ports) depends only on abstractions; OpenRouter, SSE,
+and the tool→`TransactionService` bridges are adapters. The API key is read from the environment and never
+logged; tool args are validated/clamped; the loop is capped (6 rounds) with timeouts; and every cited
+transaction id is verified to exist before it reaches the UI.
+
+**Enable it** — set your OpenRouter key and (optionally) a model, then run normally:
+```sh
+export OPENROUTER_API_KEY=sk-or-...        # required; without it the analyst returns a clear "not configured" state
+export PRISM_AI_MODEL=anthropic/claude-sonnet-4.5   # optional; use a cheaper slug (e.g. openai/gpt-4o-mini) for dev/test
+```
+Config lives under `prism.ai.*` in `backend/src/main/resources/application.yaml` (model, base-url,
+max-rounds, max-tokens, timeouts). The stream endpoint is `GET /api/analyst/stream?q=<optional question>`.
+The rest of Prism runs fine without a key — only the analyst panel is gated.
 
 ## Prerequisites
 
